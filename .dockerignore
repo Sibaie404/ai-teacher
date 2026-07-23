@@ -1,0 +1,23 @@
+# Build artifacts
+bin/
+obj/
+
+# IDE / editor
+.vs/
+.vscode/
+.idea/
+.codex/
+*.user
+*.suo
+
+# Git
+.git/
+.gitignore
+
+# Local runtime data (created fresh as volumes in the container)
+App_Data/
+wwwroot/generated/
+
+# Docs / deploy (not needed inside the image)
+deploy/
+*.md

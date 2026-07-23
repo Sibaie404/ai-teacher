@@ -8,6 +8,27 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Docker / Swarm secrets: any file mounted under /run/secrets becomes configuration.
+// A secret named "Ai__OpenAi__ApiKey" maps to configuration key "Ai:OpenAi:ApiKey".
+// Optional so local development (no such directory) is unaffected.
+if (Directory.Exists("/run/secrets"))
+{
+    builder.Configuration.AddKeyPerFile("/run/secrets", optional: true, reloadOnChange: false);
+}
+
+// When running behind a reverse proxy (Traefik terminates TLS), honor the
+// original scheme/host so HTTPS redirection and link generation are correct.
+builder.Services.Configure<Microsoft.AspNetCore.HttpOverrides.ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    // The proxy lives on the Docker overlay network; clear the default loopback
+    // restriction so forwarded headers from it are accepted.
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder.Services.AddRazorPages();
 
 builder.Services.Configure<AiOptions>(builder.Configuration.GetSection("Ai"));
@@ -71,6 +92,12 @@ builder.Services.AddSingleton<IVideoNarrationService, VideoNarrationService>();
 builder.Services.AddSingleton<RealtimeWhiteboardCoordinator>();
 
 var app = builder.Build();
+
+// Must run before other middleware so downstream sees the real scheme/host.
+app.UseForwardedHeaders();
+
+// Lightweight liveness endpoint for Traefik / Swarm health checks and rolling updates.
+app.MapGet("/healthz", () => Results.Ok("ok"));
 
 if (!app.Environment.IsDevelopment())
 {
