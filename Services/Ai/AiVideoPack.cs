@@ -1,3 +1,5 @@
+using AiTeacher.Models.Board;
+
 namespace AiTeacher.Services.Ai;
 
 public sealed record AiVideoPack(
@@ -5,4 +7,5 @@ public sealed record AiVideoPack(
     List<string> BoardLines,
     List<double> BoardTimings,
     List<double>? BoardTimestampSeconds = null,
-    List<string>? NarrationSegments = null);
+    List<string>? NarrationSegments = null,
+    List<BoardAction>? BoardActions = null);
