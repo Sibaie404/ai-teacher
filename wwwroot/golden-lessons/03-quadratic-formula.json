@@ -1,0 +1,27 @@
+{
+  "title": "Quadratic formula",
+  "subject": "Math",
+  "grade": "9-11",
+  "learningGoal": "Solve any quadratic equation using the quadratic formula.",
+  "spokenLines": [
+    "The quadratic formula solves any quadratic equation.",
+    "Any quadratic looks like a x squared plus b x plus c equals zero.",
+    "The formula is x equals negative b, plus or minus the square root of b squared minus four a c, all over two a.",
+    "Let's solve x squared minus five x plus six equals zero.",
+    "Here a is one, b is negative five, c is six.",
+    "Plug in: five, plus or minus root of twenty five minus twenty four, over two.",
+    "That's five plus or minus one, over two.",
+    "So x is three, or x is two."
+  ],
+  "timings": [0.0, 3.0, 7.0, 15.0, 20.0, 24.0, 30.0, 34.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Quadratic formula", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "ax² + bx + c = 0", "style": { "emphasis": true } },
+    { "type": "write_math", "id": "qf",    "region": "Center", "latex": "x = (-b ± √(b² - 4ac)) / (2a)", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "ex",    "region": "Left",   "latex": "x² - 5x + 6 = 0" },
+    { "type": "write_text", "id": "coef",  "region": "Left",   "text": "a=1, b=-5, c=6" },
+    { "type": "write_math", "id": "plug",  "region": "Left",   "latex": "x = (5 ± √(25 - 24)) / 2" },
+    { "type": "write_math", "id": "simp",  "region": "Left",   "latex": "x = (5 ± 1) / 2" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "x = 3  or  x = 2", "style": { "color": "success", "emphasis": true, "size": "lg" } }
+  ]
+}

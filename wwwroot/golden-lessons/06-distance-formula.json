@@ -1,0 +1,27 @@
+{
+  "title": "Distance between two points",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Find the distance between two points using d = √((x₂-x₁)² + (y₂-y₁)²).",
+  "spokenLines": [
+    "Distance between two points.",
+    "The formula is d equals the square root of x two minus x one, squared, plus y two minus y one, squared.",
+    "Let's find the distance from one comma two to four comma six.",
+    "Plot both points.",
+    "x two minus x one is three. Y two minus y one is four.",
+    "So d equals root of three squared plus four squared.",
+    "Nine plus sixteen is twenty five.",
+    "Root twenty five is five. Distance is five."
+  ],
+  "timings": [0.0, 3.0, 12.0, 15.5, 19.0, 24.0, 28.0, 32.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Distance formula", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "d = √((x₂-x₁)² + (y₂-y₁)²)", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "prob",  "region": "Left",  "text": "Points: (1,2) and (4,6)" },
+    { "type": "draw_axes", "id": "ax",     "region": "WorkArea", "range": { "xMin": -1, "xMax": 7, "yMin": -1, "yMax": 7 } },
+    { "type": "draw_point", "id": "p1",    "axesId": "ax", "at": { "x": 1, "y": 2 }, "label": "(1,2)" },
+    { "type": "draw_point", "id": "p2",    "axesId": "ax", "at": { "x": 4, "y": 6 }, "label": "(4,6)" },
+    { "type": "write_math", "id": "plug",  "region": "Left",  "latex": "d = √(3² + 4²) = √(9 + 16)" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "d = 5", "style": { "color": "success", "emphasis": true, "size": "lg" } }
+  ]
+}

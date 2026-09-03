@@ -1,0 +1,27 @@
+{
+  "title": "Equation of a circle",
+  "subject": "Math",
+  "grade": "9-11",
+  "learningGoal": "Read the center and radius from (x-h)² + (y-k)² = r².",
+  "spokenLines": [
+    "Every circle has an equation.",
+    "In standard form: x minus h, squared, plus y minus k, squared, equals r squared.",
+    "The center is h comma k. The radius is r.",
+    "Take x minus two, squared, plus y plus three, squared, equals sixteen.",
+    "Center: two, negative three. Watch the signs — plus three means minus negative three.",
+    "Radius: the square root of sixteen, which is four.",
+    "Draw the axes and the circle.",
+    "That's it — read the numbers straight off."
+  ],
+  "timings": [0.0, 2.5, 8.5, 13.5, 20.0, 26.0, 30.0, 35.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Circle equation", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "(x - h)² + (y - k)² = r²", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "meaning", "region": "Left", "text": "center (h, k),  radius r" },
+    { "type": "write_math", "id": "ex",    "region": "Left",  "latex": "(x - 2)² + (y + 3)² = 16" },
+    { "type": "write_text", "id": "c",     "region": "Left",  "text": "center = (2, -3)",  "style": { "emphasis": true } },
+    { "type": "write_text", "id": "r",     "region": "Left",  "text": "radius = 4",         "style": { "emphasis": true } },
+    { "type": "draw_axes", "id": "ax",     "region": "WorkArea", "range": { "xMin": -6, "xMax": 8, "yMin": -8, "yMax": 4 } },
+    { "type": "draw_circle", "id": "cir",  "axesId": "ax", "center": { "x": 2, "y": -3 }, "radius": 4, "style": { "color": "accent" } }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "title": "Solving a system by substitution",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Solve a two-variable system using substitution.",
+  "spokenLines": [
+    "Two equations, two unknowns. Let's solve.",
+    "Equation one: y equals two x plus one.",
+    "Equation two: three x plus y equals eleven.",
+    "y is already isolated in the first one — perfect for substitution.",
+    "Substitute two x plus one into equation two.",
+    "That gives three x plus two x plus one equals eleven.",
+    "Combine: five x plus one equals eleven.",
+    "Solve: five x equals ten, so x equals two.",
+    "Back-substitute: y equals two times two plus one, which is five.",
+    "Answer: x is two, y is five. That's where the two lines meet."
+  ],
+  "timings": [0.0, 3.0, 6.5, 10.0, 14.5, 19.0, 24.0, 28.0, 33.0, 38.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Substitution method", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "eq1",   "region": "Left",  "latex": "y = 2x + 1" },
+    { "type": "write_math", "id": "eq2",   "region": "Left",  "latex": "3x + y = 11" },
+    { "type": "underline", "id": "u1",     "targetId": "eq1" },
+    { "type": "write_math", "id": "sub",   "region": "Left",  "latex": "3x + (2x + 1) = 11" },
+    { "type": "write_math", "id": "exp",   "region": "Left",  "latex": "3x + 2x + 1 = 11" },
+    { "type": "write_math", "id": "comb",  "region": "Left",  "latex": "5x + 1 = 11" },
+    { "type": "write_math", "id": "x",     "region": "Left",  "latex": "x = 2", "style": { "emphasis": true } },
+    { "type": "write_math", "id": "y",     "region": "Left",  "latex": "y = 2(2) + 1 = 5" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "(x, y) = (2, 5)", "style": { "color": "success", "emphasis": true, "size": "lg" } }
+  ]
+}
