@@ -13,7 +13,7 @@
     return;
 }
 
-<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
+<link href="~/css/handwriting.css" rel="stylesheet" asp-append-version="true" />
 
 <script type="application/json" id="lesson-fixture">@Html.Raw(Model.RawJson)</script>
 
@@ -87,7 +87,7 @@
 </style>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.min.js"></script>
+    <script src="~/lib/rough.js" asp-append-version="true"></script>
     <script src="~/js/board-renderer.js" asp-append-version="true"></script>
     <script>
         (function () {
@@ -175,6 +175,12 @@
             };
 
             if (actions.length > 0) setBeat(0);
+
+            // Canvas text rendered before the handwriting font finished loading
+            // uses the fallback face; repaint once fonts are ready.
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => { if (current >= 0) renderer.repaint(); });
+            }
         })();
     </script>
 }

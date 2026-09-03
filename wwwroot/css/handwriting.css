@@ -1,0 +1,33 @@
+/* Self-hosted handwriting fonts for the whiteboard (vendored from @fontsource). */
+
+@font-face {
+    font-family: "Kalam";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/kalam-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Kalam";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/kalam-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Caveat";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/caveat-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Caveat";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/caveat-latin-700-normal.woff2") format("woff2");
+}
