@@ -4,7 +4,7 @@
     ViewData["Title"] = Model.Title;
 }
 
-@if (Model.NotFound)
+@if (Model.LessonMissing)
 {
     <div class="card">
         <h1>Lesson not found</h1>
@@ -101,6 +101,7 @@
             const timings = Array.isArray(fixture.timings) ? fixture.timings : [];
 
             const renderer = new BoardRenderer(canvas, { showLog: true });
+            renderer.setActions(actions);
             const spokenEl   = document.getElementById("board-debug-spoken");
             const jsonEl     = document.getElementById("board-debug-current-json");
             const logEl      = document.getElementById("board-debug-log");
@@ -163,7 +164,7 @@
                 playing = false;
                 if (rafId) cancelAnimationFrame(rafId);
                 current = -1;
-                renderer.reset();
+                renderer.setActions(actions);
                 setBeat(0);
             };
             document.getElementById("board-debug-prev").onclick = () => {

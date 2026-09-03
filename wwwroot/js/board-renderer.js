@@ -223,8 +223,8 @@
 
   BoardRenderer.prototype.drawAction = function (action) {
     switch (action.type) {
-      case "write_text":     return this.drawText(action);
-      case "write_math":     return this.drawText({ ...action, text: action.latex });
+      case "write_text":
+      case "write_math":     return this.drawText(action);
       case "draw_axes":      return this.drawAxes(action);
       case "draw_line":      return this.drawLine(action);
       case "draw_point":     return this.drawPoint(action);
@@ -267,12 +267,13 @@
     // rotate a hair for a hand-written feel
     c.translate(rect.x + 6, y);
     c.rotate((Math.random() - 0.5) * 0.005);
-    c.fillText(action.text || "", 0, 0);
+    const content = action.text != null ? action.text : (action.latex || "");
+    c.fillText(content, 0, 0);
     // Remember bounds for later emphasis actions.
     action._bounds = {
       x: rect.x + 6,
       y: y - size,
-      w: c.measureText(action.text || "").width,
+      w: c.measureText(content).width,
       h: size + 4
     };
     c.restore();

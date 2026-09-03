@@ -23,7 +23,7 @@ public class IndexModel : PageModel
         {
             try
             {
-                using var stream = File.OpenRead(file);
+                using var stream = System.IO.File.OpenRead(file);
                 using var doc = JsonDocument.Parse(stream);
                 var root = doc.RootElement;
                 Lessons.Add(new GoldenLessonSummary

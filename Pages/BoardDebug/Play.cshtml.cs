@@ -15,20 +15,20 @@ public class PlayModel : PageModel
     public string Slug { get; private set; } = "";
     public string RawJson { get; private set; } = "{}";
     public string Title { get; private set; } = "Golden lesson";
-    public bool NotFound { get; private set; }
+    public bool LessonMissing { get; private set; }
 
     public IActionResult OnGet(string slug)
     {
         Slug = slug ?? "";
         if (string.IsNullOrWhiteSpace(Slug) || Slug.Contains('/') || Slug.Contains('\\') || Slug.Contains(".."))
         {
-            NotFound = true;
+            LessonMissing = true;
             return Page();
         }
         var path = Path.Combine(_env.WebRootPath, "golden-lessons", Slug + ".json");
         if (!System.IO.File.Exists(path))
         {
-            NotFound = true;
+            LessonMissing = true;
             return Page();
         }
         RawJson = System.IO.File.ReadAllText(path);
