@@ -1,0 +1,25 @@
+{
+  "title": "Newton's second law",
+  "subject": "Science",
+  "grade": "10-11",
+  "learningGoal": "Use F = ma to solve for force, mass, or acceleration.",
+  "spokenLines": [
+    "Newton's second law. Force equals mass times acceleration.",
+    "Push a heavier object and it accelerates less for the same force.",
+    "Push with more force and the object accelerates more.",
+    "Example: a five kilogram box, pushed with twenty newtons of force.",
+    "Solve for acceleration: a equals F over m.",
+    "That's twenty over five.",
+    "Acceleration is four meters per second squared."
+  ],
+  "timings": [0.0, 4.5, 9.0, 13.5, 19.0, 22.5, 25.5],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Newton's second law", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "law",   "region": "Left",  "latex": "F = m · a", "style": { "size": "title", "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "why",   "region": "Left",  "text": "more mass → less accel (same F)" },
+    { "type": "write_text", "id": "prob",  "region": "Center", "text": "5 kg box, pushed with 20 N", "style": { "emphasis": true } },
+    { "type": "write_math", "id": "solveFor", "region": "Center", "latex": "a = F / m" },
+    { "type": "write_math", "id": "sub",   "region": "Center", "latex": "a = 20 / 5" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "a = 4 m/s²", "style": { "color": "success", "emphasis": true, "size": "xl" } }
+  ]
+}

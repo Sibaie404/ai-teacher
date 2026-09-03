@@ -1,0 +1,23 @@
+{
+  "title": "The water cycle",
+  "subject": "Science",
+  "grade": "9",
+  "learningGoal": "Trace water through evaporation, condensation, precipitation, and collection.",
+  "spokenLines": [
+    "The water cycle. Water moves in a loop, powered by the sun.",
+    "First: evaporation. The sun heats liquid water and it rises as vapor.",
+    "Next: condensation. Cool air up high turns vapor into tiny droplets — clouds.",
+    "Then: precipitation. Droplets combine and fall as rain, snow, or hail.",
+    "Finally: collection. Water gathers in rivers, lakes, and oceans.",
+    "And then the sun evaporates it again. The loop keeps going forever."
+  ],
+  "timings": [0.0, 4.5, 10.5, 17.0, 23.0, 28.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "The water cycle", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_text", "id": "s1",    "region": "TopLeft",     "text": "1. Evaporation",   "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "s2",    "region": "TopRight",    "text": "2. Condensation",  "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "s3",    "region": "BottomRight", "text": "3. Precipitation", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "s4",    "region": "BottomLeft",  "text": "4. Collection",    "style": { "emphasis": true, "color": "accent" } },
+    { "type": "draw_arrow", "id": "loop",  "region": "Center", "from": { "x": 0.15, "y": 0.8 }, "to": { "x": 0.15, "y": 0.2 }, "label": "sun heats water" }
+  ]
+}
