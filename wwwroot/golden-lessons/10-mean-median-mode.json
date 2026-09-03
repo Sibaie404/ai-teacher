@@ -1,0 +1,27 @@
+{
+  "title": "Mean, median, and mode",
+  "subject": "Math",
+  "grade": "9",
+  "learningGoal": "Compute mean, median, and mode of a small data set.",
+  "spokenLines": [
+    "Three measures of center: mean, median, mode.",
+    "Data: two, four, four, seven, nine.",
+    "Mean is the average — add them up, divide by how many.",
+    "Two plus four plus four plus seven plus nine is twenty six.",
+    "Divide by five, that's five point two.",
+    "Median is the middle number of the sorted list. Here it's four.",
+    "Mode is the number that appears most often. That's four as well.",
+    "So mean five point two, median four, mode four."
+  ],
+  "timings": [0.0, 3.5, 8.0, 13.0, 17.5, 23.0, 28.0, 32.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Mean, median, mode", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "data",  "region": "Left",  "latex": "{2, 4, 4, 7, 9}", "style": { "size": "lg" } },
+    { "type": "write_math", "id": "meanF", "region": "Left",  "latex": "mean = (Σx) / n" },
+    { "type": "write_math", "id": "sum",   "region": "Left",  "latex": "sum = 2+4+4+7+9 = 26" },
+    { "type": "write_math", "id": "mean",  "region": "Left",  "latex": "mean = 26 / 5 = 5.2" },
+    { "type": "write_math", "id": "med",   "region": "Right", "latex": "median = 4" },
+    { "type": "write_math", "id": "mode",  "region": "Right", "latex": "mode = 4" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "mean 5.2 | median 4 | mode 4", "style": { "color": "success", "emphasis": true } }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "title": "Compound interest",
+  "subject": "Math",
+  "grade": "10-11",
+  "learningGoal": "Apply A = P(1 + r/n)^(nt) to compute compound growth.",
+  "spokenLines": [
+    "Compound interest — the money you earn also earns money.",
+    "The formula: A equals P times, one plus r over n, all raised to n t.",
+    "P is principal. r is rate. n is times per year compounded. t is years.",
+    "Say you invest one thousand dollars at five percent, compounded yearly, for ten years.",
+    "P is one thousand. r is zero point zero five. n is one. t is ten.",
+    "So A equals one thousand times one point zero five to the tenth.",
+    "One point zero five to the tenth is about one point six two nine.",
+    "A is about one thousand six hundred twenty nine dollars.",
+    "So five percent for ten years grows a thousand into sixteen twenty nine."
+  ],
+  "timings": [0.0, 3.5, 9.0, 15.0, 21.0, 26.0, 31.0, 36.0, 41.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Compound interest", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "A = P(1 + r/n)^(nt)", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "key",   "region": "Left",  "text": "P principal, r rate, n periods/yr, t years" },
+    { "type": "write_text", "id": "given", "region": "Left",  "text": "$1000  |  5%  |  yearly  |  10 yrs" },
+    { "type": "write_math", "id": "sub",   "region": "Left",  "latex": "A = 1000 · (1 + 0.05/1)^(1·10)" },
+    { "type": "write_math", "id": "simp",  "region": "Left",  "latex": "A = 1000 · (1.05)^10" },
+    { "type": "write_math", "id": "pow",   "region": "Left",  "latex": "(1.05)^10 ≈ 1.629" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "A ≈ $1,629", "style": { "color": "success", "emphasis": true, "size": "xl" } },
+    { "type": "write_text", "id": "insight", "region": "Right", "text": "62.9% gain from compounding", "style": { "color": "muted" } }
+  ]
+}

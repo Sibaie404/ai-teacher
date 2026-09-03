@@ -1,0 +1,25 @@
+{
+  "title": "Percent change",
+  "subject": "Math",
+  "grade": "9",
+  "learningGoal": "Compute percent change with (new - old) / old × 100.",
+  "spokenLines": [
+    "Percent change tells you how much something grew or shrank.",
+    "Formula: new minus old, divided by old, times one hundred.",
+    "Say a shirt goes from fifty dollars to sixty five.",
+    "New minus old is fifteen.",
+    "Divide by the old, fifty. That's zero point three.",
+    "Times one hundred: thirty percent increase.",
+    "If the number is negative, that's a decrease instead."
+  ],
+  "timings": [0.0, 3.5, 8.5, 13.0, 16.5, 21.0, 26.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Percent change", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "% change = (new − old) / old × 100", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "draw_bar_chart", "id": "bars", "region": "WorkArea", "title": "Price", "bars": [ { "label": "Old", "value": 50 }, { "label": "New", "value": 65 } ] },
+    { "type": "write_math", "id": "step1", "region": "Left",  "latex": "new − old = 65 − 50 = 15" },
+    { "type": "write_math", "id": "step2", "region": "Left",  "latex": "15 / 50 = 0.30" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "+30%", "style": { "color": "success", "emphasis": true, "size": "xl" } },
+    { "type": "write_text", "id": "note",  "region": "Right", "text": "negative % = decrease", "style": { "color": "muted" } }
+  ]
+}
