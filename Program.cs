@@ -69,6 +69,7 @@ builder.Services.AddSingleton<IAiSpeechClient>(sp =>
 builder.Services.AddSingleton<IAiTeacherService, AiTeacherService>();
 builder.Services.AddSingleton<IVideoNarrationService, VideoNarrationService>();
 builder.Services.AddSingleton<RealtimeWhiteboardCoordinator>();
+builder.Services.AddSingleton<AiTeacher.Services.Board.IBoardDirectorService, AiTeacher.Services.Board.BoardDirectorService>();
 
 var app = builder.Build();
 
