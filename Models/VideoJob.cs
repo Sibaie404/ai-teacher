@@ -1,3 +1,5 @@
+using AiTeacher.Models.Board;
+
 namespace AiTeacher.Models;
 
 public sealed class VideoJob
@@ -13,4 +15,8 @@ public sealed class VideoJob
     public string? AudioUrl { get; set; }
     public string? VideoUrl { get; set; }
     public DateTimeOffset CreatedAtUtc { get; set; }
+
+    // New structured board plan. When present it supersedes BoardLines for rendering.
+    // BoardActions[i] pairs with NarrationSegments[i] and BoardTimestampSeconds[i].
+    public List<BoardAction>? BoardActions { get; set; }
 }

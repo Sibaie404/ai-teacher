@@ -1,0 +1,151 @@
+@page
+@model AiTeacher.Pages.BoardDebug.DirectModel
+@{
+    ViewData["Title"] = "Board Director";
+}
+
+<link href="~/css/handwriting.css" rel="stylesheet" asp-append-version="true" />
+
+<div class="card">
+    <div class="meta">
+        <a class="btn" asp-page="/BoardDebug/Index">Back to golden lessons</a>
+        <span class="badge">Director agent</span>
+    </div>
+    <h1>Board Director</h1>
+    <p class="muted">Generate a structured board script from a topic, or paste any model's raw output to run it through the same parse &rarr; validate &rarr; render pipeline.</p>
+
+    <form method="post" class="form">
+        <label class="label" for="topic">Topic</label>
+        <input id="topic" class="input" asp-for="Topic" placeholder="e.g. Completing the square" />
+
+        <label class="label" for="spoken">Fixed narration (optional — one spoken line per row; leave empty to let the Director write it)</label>
+        <textarea id="spoken" class="input" asp-for="SpokenLinesText" rows="5" placeholder="Okay, let's talk about completing the square.&#10;Start with x squared plus six x plus five."></textarea>
+
+        <div class="qa-actions">
+            <button type="submit" asp-page-handler="Run" class="btn primary">Run Director</button>
+        </div>
+
+        <details>
+            <summary class="muted">Or paste raw model output (parse &amp; validate only, no API call)</summary>
+            <label class="label" for="pasted">Raw model response</label>
+            <textarea id="pasted" class="input" asp-for="PastedOutput" rows="8" placeholder='{"schemaVersion":1,"spokenLines":[...],"timings":[...],"actions":[...]}'></textarea>
+            <div class="qa-actions">
+                <button type="submit" asp-page-handler="Parse" class="btn">Parse &amp; render</button>
+            </div>
+        </details>
+    </form>
+
+    <div asp-validation-summary="All" class="muted small qa-error"></div>
+</div>
+
+@if (Model.Ran && Model.Result is not null)
+{
+    @if (Model.Result.Success && Model.ScriptJson is not null)
+    {
+        <script type="application/json" id="director-script">@Html.Raw(Model.ScriptJson)</script>
+
+        <div class="card">
+            <h2>Generated board (@Model.Result.Attempts attempt@(Model.Result.Attempts == 1 ? "" : "s"))</h2>
+            <div class="board-debug-stage">
+                <canvas id="board-debug-canvas" width="1280" height="720"></canvas>
+            </div>
+            <div class="board-debug-controls">
+                <button id="board-debug-prev" type="button" class="btn">&#9664; Beat</button>
+                <button id="board-debug-next" type="button" class="btn">Beat &#9654;</button>
+                <span id="board-debug-beat-indicator" class="muted"></span>
+            </div>
+            <div class="board-debug-panels">
+                <div class="board-debug-panel">
+                    <h3>Now speaking</h3>
+                    <p id="board-debug-spoken" class="board-debug-spoken">&mdash;</p>
+                </div>
+                <div class="board-debug-panel">
+                    <h3>Tool call</h3>
+                    <pre id="board-debug-current-json" class="board-debug-json">&mdash;</pre>
+                </div>
+                <div class="board-debug-panel">
+                    <h3>Full script JSON</h3>
+                    <pre class="board-debug-json">@Model.ScriptJson</pre>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <h2>Director failed after @Model.Result.Attempts attempt@(Model.Result.Attempts == 1 ? "" : "s")</h2>
+            <ul>
+                @foreach (var error in Model.Result.Errors)
+                {
+                    <li class="qa-error">@error</li>
+                }
+            </ul>
+            <h3>Raw model response</h3>
+            <pre class="board-debug-json">@Model.Result.RawResponse</pre>
+        </div>
+    }
+}
+
+<style>
+    .board-debug-stage {
+        background: #fafaf7;
+        border-radius: 14px;
+        border: 1px solid rgba(17,24,39,0.15);
+        padding: 8px;
+        overflow: hidden;
+    }
+    .board-debug-stage canvas { display: block; width: 100%; height: auto; border-radius: 10px; }
+    .board-debug-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+    .board-debug-panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .board-debug-panel {
+        border: 1px solid rgba(17,24,39,0.10);
+        border-radius: 10px;
+        padding: 10px;
+        background: rgba(255,255,255,0.6);
+    }
+    .board-debug-panel h3 { margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; }
+    .board-debug-spoken { font-size: 18px; font-family: "Kalam", cursive; color: #1f2937; }
+    .board-debug-json { max-height: 260px; overflow: auto; font-size: 12px; background: #0f172a; color: #e5e7eb; padding: 8px; border-radius: 6px; white-space: pre-wrap; }
+    .qa-error { color: #ef4444; }
+</style>
+
+@section Scripts {
+    <script src="~/lib/rough.js" asp-append-version="true"></script>
+    <script src="~/js/board-renderer.js" asp-append-version="true"></script>
+    <script>
+        (function () {
+            const scriptEl = document.getElementById("director-script");
+            const canvas = document.getElementById("board-debug-canvas");
+            if (!scriptEl || !canvas) return;
+
+            const script = JSON.parse(scriptEl.textContent || "{}");
+            const actions = Array.isArray(script.actions) ? script.actions : [];
+            const spoken  = Array.isArray(script.spokenLines) ? script.spokenLines : [];
+
+            const renderer = new BoardRenderer(canvas, {});
+            renderer.setActions(actions);
+
+            const spokenEl = document.getElementById("board-debug-spoken");
+            const jsonEl   = document.getElementById("board-debug-current-json");
+            const beatEl   = document.getElementById("board-debug-beat-indicator");
+
+            let current = -1;
+            function setBeat(i) {
+                current = i;
+                renderer.advanceTo(i);
+                spokenEl.textContent = spoken[i] || "—";
+                jsonEl.textContent = actions[i] ? JSON.stringify(actions[i], null, 2) : "—";
+                beatEl.textContent = `Beat ${i + 1} / ${actions.length}`;
+            }
+
+            document.getElementById("board-debug-prev").onclick = () => { if (current > 0) setBeat(current - 1); };
+            document.getElementById("board-debug-next").onclick = () => { if (current < actions.length - 1) setBeat(current + 1); };
+
+            if (actions.length > 0) setBeat(actions.length - 1);
+
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => { if (current >= 0) renderer.repaint(); });
+            }
+        })();
+    </script>
+}

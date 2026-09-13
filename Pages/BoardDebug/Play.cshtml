@@ -1,0 +1,186 @@
+@page "{slug}"
+@model AiTeacher.Pages.BoardDebug.PlayModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@if (Model.LessonMissing)
+{
+    <div class="card">
+        <h1>Lesson not found</h1>
+        <a class="btn" asp-page="/BoardDebug/Index">Back to golden lessons</a>
+    </div>
+    return;
+}
+
+<link href="~/css/handwriting.css" rel="stylesheet" asp-append-version="true" />
+
+<script type="application/json" id="lesson-fixture">@Html.Raw(Model.RawJson)</script>
+
+<div class="card">
+    <div class="meta">
+        <a class="btn" asp-page="/BoardDebug/Index">Back</a>
+        <span class="badge">Golden lesson</span>
+        <span class="muted">Slug: @Model.Slug</span>
+    </div>
+    <h1>@Model.Title</h1>
+
+    <div class="board-debug-stage">
+        <canvas id="board-debug-canvas" width="1280" height="720"></canvas>
+    </div>
+
+    <div class="board-debug-controls">
+        <button id="board-debug-play" type="button" class="btn primary">Play</button>
+        <button id="board-debug-pause" type="button" class="btn">Pause</button>
+        <button id="board-debug-restart" type="button" class="btn">Restart</button>
+        <button id="board-debug-prev" type="button" class="btn">◀ Beat</button>
+        <button id="board-debug-next" type="button" class="btn">Beat ▶</button>
+        <label class="label inline">Speed
+            <input id="board-debug-speed" type="range" min="0.5" max="2.0" step="0.1" value="1.0" />
+        </label>
+        <span id="board-debug-beat-indicator" class="muted"></span>
+    </div>
+
+    <div class="board-debug-panels">
+        <div class="board-debug-panel">
+            <h3>Now speaking</h3>
+            <p id="board-debug-spoken" class="board-debug-spoken">—</p>
+        </div>
+        <div class="board-debug-panel">
+            <h3>Tool call</h3>
+            <pre id="board-debug-current-json" class="board-debug-json">—</pre>
+        </div>
+        <div class="board-debug-panel">
+            <h3>Log</h3>
+            <ol id="board-debug-log" class="board-debug-log"></ol>
+        </div>
+    </div>
+</div>
+
+<style>
+    .board-debug-stage {
+        background: #fafaf7;
+        border-radius: 14px;
+        border: 1px solid rgba(17,24,39,0.15);
+        padding: 8px;
+        overflow: hidden;
+    }
+    .board-debug-stage canvas { display: block; width: 100%; height: auto; border-radius: 10px; }
+    .board-debug-controls {
+        display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+        margin: 12px 0;
+    }
+    .board-debug-panels {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+    }
+    .board-debug-panel {
+        border: 1px solid rgba(17,24,39,0.10);
+        border-radius: 10px;
+        padding: 10px;
+        background: rgba(255,255,255,0.6);
+    }
+    .board-debug-panel h3 { margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; }
+    .board-debug-spoken { font-size: 18px; font-family: "Kalam", cursive; color: #1f2937; }
+    .board-debug-json { max-height: 220px; overflow: auto; font-size: 12px; background: #0f172a; color: #e5e7eb; padding: 8px; border-radius: 6px; }
+    .board-debug-log { max-height: 220px; overflow: auto; font-size: 12px; padding-left: 24px; }
+    .board-debug-log li.active { color: #7c3aed; font-weight: 700; }
+</style>
+
+@section Scripts {
+    <script src="~/lib/rough.js" asp-append-version="true"></script>
+    <script src="~/js/board-renderer.js" asp-append-version="true"></script>
+    <script>
+        (function () {
+            const fixtureEl = document.getElementById("lesson-fixture");
+            const canvas = document.getElementById("board-debug-canvas");
+            if (!fixtureEl || !canvas) return;
+
+            const fixture = JSON.parse(fixtureEl.textContent || "{}");
+            const actions = Array.isArray(fixture.actions) ? fixture.actions : [];
+            const spoken  = Array.isArray(fixture.spokenLines) ? fixture.spokenLines : [];
+            const timings = Array.isArray(fixture.timings) ? fixture.timings : [];
+
+            const renderer = new BoardRenderer(canvas, { showLog: true });
+            renderer.setActions(actions);
+            const spokenEl   = document.getElementById("board-debug-spoken");
+            const jsonEl     = document.getElementById("board-debug-current-json");
+            const logEl      = document.getElementById("board-debug-log");
+            const beatEl     = document.getElementById("board-debug-beat-indicator");
+            const speedEl    = document.getElementById("board-debug-speed");
+
+            // Populate log
+            actions.forEach((a, i) => {
+                const li = document.createElement("li");
+                li.dataset.index = i;
+                const t = timings[i] != null ? ` (${timings[i].toFixed(1)}s)` : "";
+                li.textContent = `${a.type}${a.id ? " #" + a.id : ""}${t}`;
+                logEl.appendChild(li);
+            });
+
+            let current = -1;
+            let playing = false;
+            let startedAt = 0;
+            let baseSpeed = 1.0;
+            let rafId = null;
+
+            function setBeat(i) {
+                current = i;
+                renderer.advanceTo(i);
+                const a = actions[i];
+                spokenEl.textContent = spoken[i] || "—";
+                jsonEl.textContent = a ? JSON.stringify(a, null, 2) : "—";
+                beatEl.textContent = `Beat ${i + 1} / ${actions.length}`;
+                logEl.querySelectorAll("li").forEach(li => li.classList.toggle("active", Number(li.dataset.index) === i));
+            }
+
+            function stepIfDue(now) {
+                if (!playing) return;
+                const elapsed = ((now - startedAt) / 1000) * baseSpeed;
+                let next = current;
+                for (let i = current + 1; i < actions.length; i++) {
+                    if ((timings[i] ?? i * 3) <= elapsed) next = i;
+                    else break;
+                }
+                if (next !== current) setBeat(next);
+                if (current >= actions.length - 1) { playing = false; return; }
+                rafId = requestAnimationFrame(stepIfDue);
+            }
+
+            document.getElementById("board-debug-play").onclick = () => {
+                if (playing) return;
+                playing = true;
+                baseSpeed = parseFloat(speedEl.value) || 1.0;
+                const startBeat = Math.max(0, current);
+                const startTime = timings[startBeat] ?? startBeat * 3;
+                startedAt = performance.now() - (startTime / baseSpeed) * 1000;
+                if (current < 0) setBeat(0);
+                rafId = requestAnimationFrame(stepIfDue);
+            };
+            document.getElementById("board-debug-pause").onclick = () => {
+                playing = false;
+                if (rafId) cancelAnimationFrame(rafId);
+            };
+            document.getElementById("board-debug-restart").onclick = () => {
+                playing = false;
+                if (rafId) cancelAnimationFrame(rafId);
+                current = -1;
+                renderer.setActions(actions);
+                setBeat(0);
+            };
+            document.getElementById("board-debug-prev").onclick = () => {
+                if (current > 0) setBeat(current - 1);
+            };
+            document.getElementById("board-debug-next").onclick = () => {
+                if (current < actions.length - 1) setBeat(current + 1);
+            };
+
+            if (actions.length > 0) setBeat(0);
+
+            // Canvas text rendered before the handwriting font finished loading
+            // uses the fallback face; repaint once fonts are ready.
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => { if (current >= 0) renderer.repaint(); });
+            }
+        })();
+    </script>
+}

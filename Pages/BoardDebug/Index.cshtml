@@ -1,0 +1,40 @@
+@page
+@model AiTeacher.Pages.BoardDebug.IndexModel
+@{
+    ViewData["Title"] = "Board Debug";
+}
+
+<div class="card">
+    <h1>Board debug — golden lessons</h1>
+    <p class="muted">Author and preview structured <code>BoardAction</code> lessons. Each fixture lives in <code>wwwroot/golden-lessons/</code>.</p>
+    <p><a class="btn primary" asp-page="/BoardDebug/Direct">Board Director (generate a script from a topic)</a></p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Subject</th>
+                <th>Grade</th>
+                <th>Beats</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lesson in Model.Lessons)
+            {
+                <tr>
+                    <td>@lesson.Title</td>
+                    <td>@lesson.Subject</td>
+                    <td>@lesson.Grade</td>
+                    <td>@lesson.ActionCount</td>
+                    <td><a class="btn" asp-page="/BoardDebug/Play" asp-route-slug="@lesson.Slug">Play</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.Lessons.Count == 0)
+    {
+        <p class="muted">No golden lessons found yet. Add JSON files to <code>wwwroot/golden-lessons/</code>.</p>
+    }
+</div>

@@ -1,0 +1,31 @@
+{
+  "title": "Arithmetic sequences",
+  "subject": "Math",
+  "grade": "10",
+  "learningGoal": "Use a_n = a_1 + (n-1)d to find the nth term.",
+  "spokenLines": [
+    "An arithmetic sequence adds the same number every time.",
+    "Take: three, seven, eleven, fifteen.",
+    "The common difference d is four — each term jumps by four.",
+    "The first term, a one, is three.",
+    "The nth term formula: a n equals a one, plus n minus one, times d.",
+    "What's the tenth term?",
+    "Plug in: three plus, ten minus one, times four.",
+    "That's three plus nine times four.",
+    "Three plus thirty six is thirty nine.",
+    "So the tenth term is thirty nine."
+  ],
+  "timings": [0.0, 3.5, 7.0, 11.5, 15.0, 20.5, 24.0, 28.0, 32.0, 36.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Arithmetic sequences", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "seq",   "region": "Left",  "latex": "3, 7, 11, 15, ...", "style": { "size": "lg" } },
+    { "type": "write_math", "id": "d",     "region": "Left",  "latex": "d = 4", "style": { "emphasis": true } },
+    { "type": "write_math", "id": "a1",    "region": "Left",  "latex": "a₁ = 3" },
+    { "type": "write_math", "id": "form",  "region": "Center", "latex": "aₙ = a₁ + (n - 1)d", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "write_text", "id": "goal",  "region": "Right", "text": "Find a₁₀" },
+    { "type": "write_math", "id": "plug",  "region": "Right", "latex": "a₁₀ = 3 + (10 - 1)(4)" },
+    { "type": "write_math", "id": "s1",    "region": "Right", "latex": "= 3 + 9 · 4" },
+    { "type": "write_math", "id": "s2",    "region": "Right", "latex": "= 3 + 36" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "a₁₀ = 39", "style": { "color": "success", "emphasis": true, "size": "xl" } }
+  ]
+}

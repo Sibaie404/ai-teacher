@@ -1,0 +1,27 @@
+{
+  "title": "Factoring a trinomial",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Factor x² + bx + c by finding two numbers that multiply to c and add to b.",
+  "spokenLines": [
+    "Let's factor a trinomial.",
+    "Take x squared plus five x plus six.",
+    "We want two numbers that multiply to six...",
+    "and add to five.",
+    "Two and three work — two times three is six, two plus three is five.",
+    "So we factor it as x plus two, times x plus three.",
+    "Quick check: expand it and you get back x squared plus five x plus six.",
+    "Done."
+  ],
+  "timings": [0.0, 2.5, 6.5, 10.0, 14.0, 21.0, 26.0, 32.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Factoring a trinomial", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "ex",    "region": "Center", "latex": "x² + 5x + 6", "style": { "size": "lg", "emphasis": true } },
+    { "type": "write_text", "id": "goal1", "region": "Left",   "text": "Find two numbers that multiply to 6" },
+    { "type": "write_text", "id": "goal2", "region": "Left",   "text": "and add to 5." },
+    { "type": "write_math", "id": "cand",  "region": "Left",   "latex": "2 × 3 = 6   ✓" },
+    { "type": "write_math", "id": "fact",  "region": "AnswerBox", "latex": "(x + 2)(x + 3)", "style": { "color": "success", "emphasis": true, "size": "lg" } },
+    { "type": "write_math", "id": "check", "region": "Right",  "latex": "(x+2)(x+3) = x² + 5x + 6" },
+    { "type": "circle_term", "id": "final", "targetId": "fact" }
+  ]
+}

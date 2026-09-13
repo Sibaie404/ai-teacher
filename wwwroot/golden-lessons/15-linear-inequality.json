@@ -1,0 +1,23 @@
+{
+  "title": "Solving a linear inequality",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Solve inequalities like ax + b < c and know when to flip the sign.",
+  "spokenLines": [
+    "Solving a linear inequality is a lot like solving an equation.",
+    "Take negative two x plus three, less than eleven.",
+    "Subtract three from both sides. Negative two x is less than eight.",
+    "Now divide by negative two. Flip the sign when dividing by a negative.",
+    "So x is greater than negative four.",
+    "On a number line, open circle at negative four, shaded to the right."
+  ],
+  "timings": [0.0, 4.0, 8.5, 14.0, 20.0, 24.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Linear inequality", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "ex",    "region": "Left",  "latex": "-2x + 3 < 11", "style": { "size": "lg", "emphasis": true } },
+    { "type": "write_math", "id": "s1",    "region": "Left",  "latex": "-2x < 8" },
+    { "type": "write_text", "id": "flip",  "region": "Left",  "text": "÷ by negative → flip the sign", "style": { "color": "danger", "emphasis": true } },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "x > -4", "style": { "color": "success", "emphasis": true, "size": "xl" } },
+    { "type": "draw_axes", "id": "num",    "region": "BottomCenter", "range": { "xMin": -8, "xMax": 4, "yMin": -1, "yMax": 1 }, "xLabel": "x" }
+  ]
+}

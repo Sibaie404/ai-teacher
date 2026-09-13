@@ -1,0 +1,30 @@
+{
+  "title": "SOH CAH TOA",
+  "subject": "Math",
+  "grade": "10-11",
+  "learningGoal": "Use sine, cosine, tangent ratios in a right triangle.",
+  "spokenLines": [
+    "SOH CAH TOA — the trig ratios.",
+    "SOH: sine equals opposite over hypotenuse.",
+    "CAH: cosine equals adjacent over hypotenuse.",
+    "TOA: tangent equals opposite over adjacent.",
+    "In a right triangle, opposite and adjacent are relative to the angle you pick.",
+    "Say opposite is three, adjacent is four, hypotenuse is five, and we want sine of theta.",
+    "Sine theta equals three over five, which is zero point six.",
+    "Cosine theta is four over five, zero point eight.",
+    "Tangent theta is three over four, zero point seven five."
+  ],
+  "timings": [0.0, 3.0, 7.0, 11.0, 15.5, 22.0, 27.5, 32.0, 36.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "SOH CAH TOA", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "soh",   "region": "Left",  "latex": "sin θ = opp / hyp", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "cah",   "region": "Left",  "latex": "cos θ = adj / hyp", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "toa",   "region": "Left",  "latex": "tan θ = opp / adj", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "draw_triangle", "id": "tri", "region": "WorkArea", "baseLength": 4, "heightLength": 3,
+      "labels": { "baseLabel": "adj = 4", "heightLabel": "opp = 3", "hypotenuseLabel": "hyp = 5", "angleLabel": "θ" } },
+    { "type": "write_text", "id": "given", "region": "Right", "text": "opp=3, adj=4, hyp=5" },
+    { "type": "write_math", "id": "sin",   "region": "Right", "latex": "sin θ = 3/5 = 0.6" },
+    { "type": "write_math", "id": "cos",   "region": "Right", "latex": "cos θ = 4/5 = 0.8" },
+    { "type": "write_math", "id": "tan",   "region": "Right", "latex": "tan θ = 3/4 = 0.75" }
+  ]
+}

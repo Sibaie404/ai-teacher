@@ -1,0 +1,27 @@
+{
+  "title": "Function notation",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Evaluate f(x) at specific inputs.",
+  "spokenLines": [
+    "Function notation. f of x. Read that as \"f of x.\"",
+    "It means: give me an input, I'll give you an output.",
+    "Say f of x equals two x plus one.",
+    "What's f of three? Plug three in for x.",
+    "Two times three plus one is seven.",
+    "So f of three equals seven.",
+    "f of zero? Two times zero plus one, which is one.",
+    "Same rule, just swap what you plug in."
+  ],
+  "timings": [0.0, 4.0, 8.5, 13.0, 17.0, 20.5, 25.0, 30.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Function notation", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "read",  "region": "Left",  "latex": "f(x)  →  \"f of x\"", "style": { "size": "lg" } },
+    { "type": "write_text", "id": "meaning", "region": "Left", "text": "input → output" },
+    { "type": "write_math", "id": "def",   "region": "Left",  "latex": "f(x) = 2x + 1", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "q1",    "region": "Center", "latex": "f(3) = 2(3) + 1" },
+    { "type": "write_math", "id": "a1",    "region": "Center", "latex": "f(3) = 7", "style": { "color": "success", "emphasis": true } },
+    { "type": "write_math", "id": "q2",    "region": "Right", "latex": "f(0) = 2(0) + 1" },
+    { "type": "write_math", "id": "a2",    "region": "Right", "latex": "f(0) = 1", "style": { "color": "success", "emphasis": true } }
+  ]
+}

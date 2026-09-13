@@ -1,0 +1,32 @@
+{
+  "title": "Pythagorean theorem",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Given the two legs of a right triangle, find the hypotenuse using a² + b² = c².",
+  "spokenLines": [
+    "Okay, let's talk about the Pythagorean theorem.",
+    "It only works for right triangles — that little box means a ninety degree angle.",
+    "The two shorter sides are called the legs. We call them a and b.",
+    "The longest side, across from the right angle, is the hypotenuse. That's c.",
+    "The theorem says: a squared plus b squared equals c squared.",
+    "So say our legs are three and four. Let's plug them in.",
+    "Three squared is nine. Four squared is sixteen.",
+    "Add those and we get twenty five.",
+    "The square root of twenty five is five. So c equals five.",
+    "That's it. Legs three and four give a hypotenuse of five."
+  ],
+  "timings": [0.0, 3.5, 8.0, 12.5, 17.0, 22.0, 26.0, 29.5, 33.0, 37.0],
+  "actions": [
+    { "type": "write_text", "id": "title",  "region": "Title",    "text": "Pythagorean theorem",              "style": { "size": "title", "emphasis": true } },
+    { "type": "draw_triangle", "id": "tri", "region": "WorkArea", "baseLength": 4, "heightLength": 3,
+      "labels": { "baseLabel": "a", "heightLabel": "b", "hypotenuseLabel": "c" } },
+    { "type": "circle_term", "id": "hl-legs", "targetId": "tri" },
+    { "type": "write_text", "id": "hyp-note", "region": "Right", "text": "c = hypotenuse", "style": { "color": "danger" } },
+    { "type": "write_math", "id": "formula",  "region": "Left",  "latex": "a² + b² = c²",       "style": { "size": "lg", "emphasis": true } },
+    { "type": "write_math", "id": "sub",      "region": "Left",  "latex": "3² + 4² = c²" },
+    { "type": "write_math", "id": "squares",  "region": "Left",  "latex": "9 + 16 = c²" },
+    { "type": "write_math", "id": "sum",      "region": "Left",  "latex": "25 = c²" },
+    { "type": "write_math", "id": "root",     "region": "Left",  "latex": "c = 5" },
+    { "type": "circle_term", "id": "answer",  "targetId": "root" }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "title": "Basic probability",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "P(event) = favorable outcomes / total outcomes.",
+  "spokenLines": [
+    "Probability. What are the chances something happens.",
+    "Formula: favorable outcomes over total outcomes.",
+    "Say a bag has three red marbles and five blue.",
+    "Total marbles: eight.",
+    "Chance of pulling a red: three over eight.",
+    "As a decimal: about zero point three seven five.",
+    "As a percent: thirty seven point five percent."
+  ],
+  "timings": [0.0, 3.5, 8.0, 12.0, 15.5, 20.0, 24.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Probability", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "P(A) = favorable / total", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "draw_bar_chart", "id": "bag", "region": "WorkArea", "title": "Marbles in bag",
+      "bars": [ { "label": "Red", "value": 3 }, { "label": "Blue", "value": 5 } ] },
+    { "type": "write_math", "id": "tot",   "region": "Left",  "latex": "total = 3 + 5 = 8" },
+    { "type": "write_math", "id": "pRed",  "region": "Left",  "latex": "P(red) = 3/8", "style": { "emphasis": true } },
+    { "type": "write_math", "id": "dec",   "region": "Left",  "latex": "= 0.375" },
+    { "type": "write_math", "id": "pct",   "region": "AnswerBox", "latex": "= 37.5%", "style": { "color": "success", "emphasis": true, "size": "lg" } }
+  ]
+}

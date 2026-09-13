@@ -1,0 +1,25 @@
+{
+  "title": "Ratios and proportions",
+  "subject": "Math",
+  "grade": "9",
+  "learningGoal": "Use cross-multiplication to solve a proportion.",
+  "spokenLines": [
+    "A ratio compares two things. Two to three, written two colon three or two over three.",
+    "A proportion sets two ratios equal.",
+    "If two over three equals x over twelve, find x.",
+    "Cross-multiply: two times twelve, three times x.",
+    "Twenty four equals three x.",
+    "Divide both sides by three.",
+    "x equals eight."
+  ],
+  "timings": [0.0, 6.0, 10.0, 14.5, 19.0, 22.0, 25.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Ratios & proportions", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "def",   "region": "Left",  "latex": "ratio: 2 : 3  or  2/3" },
+    { "type": "write_math", "id": "prop",  "region": "Center", "latex": "2/3 = x/12", "style": { "size": "lg", "emphasis": true } },
+    { "type": "write_math", "id": "cross", "region": "Center", "latex": "2 · 12 = 3 · x" },
+    { "type": "write_math", "id": "line",  "region": "Center", "latex": "24 = 3x" },
+    { "type": "write_math", "id": "div",   "region": "Center", "latex": "24 / 3 = x" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "x = 8", "style": { "color": "success", "emphasis": true, "size": "xl" } }
+  ]
+}

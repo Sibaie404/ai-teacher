@@ -1,0 +1,26 @@
+{
+  "title": "Area of a triangle",
+  "subject": "Math",
+  "grade": "9",
+  "learningGoal": "Use A = ½ × base × height.",
+  "spokenLines": [
+    "Area of a triangle.",
+    "The formula is half times base times height.",
+    "Take a triangle with base six and height four.",
+    "Plug in: half times six times four.",
+    "Half of six is three.",
+    "Three times four is twelve.",
+    "Area is twelve square units."
+  ],
+  "timings": [0.0, 2.5, 7.5, 12.0, 16.0, 19.0, 23.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Triangle area", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "form",  "region": "Left",  "latex": "A = ½ × b × h", "style": { "size": "lg", "emphasis": true, "color": "accent" } },
+    { "type": "draw_triangle", "id": "tri", "region": "WorkArea", "baseLength": 6, "heightLength": 4,
+      "labels": { "baseLabel": "b = 6", "heightLabel": "h = 4" } },
+    { "type": "write_math", "id": "plug",  "region": "Left",  "latex": "A = ½ × 6 × 4" },
+    { "type": "write_math", "id": "half",  "region": "Left",  "latex": "A = 3 × 4" },
+    { "type": "write_math", "id": "mul",   "region": "Left",  "latex": "A = 12" },
+    { "type": "write_math", "id": "ans",   "region": "AnswerBox", "latex": "A = 12 sq units", "style": { "color": "success", "emphasis": true, "size": "lg" } }
+  ]
+}

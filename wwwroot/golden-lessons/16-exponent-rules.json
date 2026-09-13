@@ -1,0 +1,27 @@
+{
+  "title": "Exponent rules",
+  "subject": "Math",
+  "grade": "9-10",
+  "learningGoal": "Apply product, quotient, and power rules for exponents.",
+  "spokenLines": [
+    "Three main exponent rules to remember.",
+    "Product rule: same base, add the exponents.",
+    "Quotient rule: same base, subtract the exponents.",
+    "Power rule: power of a power, multiply the exponents.",
+    "Example: x to the third, times x to the fifth, is x to the eighth.",
+    "x to the seventh over x squared is x to the fifth.",
+    "x squared, all raised to the third, is x to the sixth.",
+    "That's it. Add, subtract, multiply — depending on the operation."
+  ],
+  "timings": [0.0, 3.0, 7.5, 12.0, 17.0, 22.0, 27.0, 32.0],
+  "actions": [
+    { "type": "write_text", "id": "title", "region": "Title", "text": "Exponent rules", "style": { "size": "title", "emphasis": true } },
+    { "type": "write_math", "id": "prod",  "region": "Left",  "latex": "x^a · x^b = x^(a+b)", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "quot",  "region": "Left",  "latex": "x^a / x^b = x^(a-b)", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "pow",   "region": "Left",  "latex": "(x^a)^b = x^(a·b)", "style": { "emphasis": true, "color": "accent" } },
+    { "type": "write_math", "id": "ex1",   "region": "Right", "latex": "x^3 · x^5 = x^8" },
+    { "type": "write_math", "id": "ex2",   "region": "Right", "latex": "x^7 / x^2 = x^5" },
+    { "type": "write_math", "id": "ex3",   "region": "Right", "latex": "(x^2)^3 = x^6" },
+    { "type": "write_text", "id": "recap", "region": "AnswerBox", "text": "add · subtract · multiply", "style": { "color": "success", "emphasis": true } }
+  ]
+}
