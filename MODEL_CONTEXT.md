@@ -1,9 +1,69 @@
 # AI Teacher Model Context
 
-Last updated: 2026-04-12
-Repo: `i0mar/ai-teacher`
-Branch: `main`
-Commit: `7068423` (`Add ElevenLabs narration and improve board planning`)
+Last updated: 2026-09-13
+Repo: `Sibaie404/ai-teacher`
+Branch: `claude/enhance-board-visuals-g84Ub` (PR #1)
+Commit: `8ef7e7f` (`Add Board Director agent with validation, repair loop, and debug page`)
+
+> Newest work first: see section 0 for the structured-board overhaul added on
+> this branch. Sections 1-21 describe the pre-existing system and are still
+> accurate for the legacy pipeline.
+
+## 0. Structured Board Overhaul (this branch)
+
+The whiteboard is moving from free-text `DRAW:` strings to a structured,
+validated tool-call schema. Everything is additive - the legacy
+BoardLines/BoardTimings pipeline still works untouched.
+
+What exists now:
+
+- `Models/Board/BoardAction.cs` - polymorphic action records discriminated on
+  `type` (write_text, write_math, draw_axes/line/point/circle/square/triangle/
+  arrow/bracket/bar_chart, highlight, circle_term, underline, strike, focus,
+  erase, clear, new_page, pan_to). Optional `id`, `region`, `style` on every
+  action.
+- `Models/Board/BoardScript.cs` - actions + spokenLines + timings triple with
+  the invariant that all three have equal length (item i = one teaching beat).
+- `Services/Board/BoardActionJson.cs` - the serializer options (camelCase,
+  string enums, out-of-order discriminator). Always use these.
+- `Services/Board/LegacyBoardLineConverter.cs` - DRAW-string -> BoardAction
+  bridge for incremental migration.
+- `Services/Board/BoardDirectorService.cs` - the Director agent (agent 3 of
+  the course-mode design). Takes a topic + optional fixed narration, few-shot
+  prompted with golden lessons, emits a BoardScript. Validates hard (count
+  invariants, non-decreasing timings, targetId/axesId references) and gives
+  the model one repair round-trip with the exact errors.
+- `wwwroot/js/board-renderer.js` - self-contained canvas renderer: 13 named
+  regions, vendored rough.js sketchy strokes, vendored Kalam/Caveat
+  handwriting fonts (wwwroot/lib, wwwroot/fonts, wwwroot/css/handwriting.css).
+- `Pages/BoardDebug/` - debug surfaces: Index lists golden lessons, Play
+  scrubs through one beat-by-beat with a tool-call log, Direct runs the
+  Director live or parses pasted model output through the same
+  parse+validate+render path.
+- `wwwroot/golden-lessons/*.json` - 20 hand-authored ideal lessons. They are
+  both few-shot examples for the Director and regression fixtures. Keep the
+  actions == spokenLines == timings invariant when editing.
+- `VideoJob.BoardActions` and `AiVideoPack.BoardActions` - additive nullable
+  fields; when present they supersede BoardLines at render time.
+
+Verified: `dotnet build` clean; all 20 golden lessons render headlessly in
+Chromium with zero JS errors; Director paths (valid parse, invalid parse,
+stub-provider failure) tested end-to-end.
+
+Agreed next steps, in order:
+
+1. Wire the Director into the lesson pipeline: after AiTeacherService
+   generates a pack, call IBoardDirectorService with the SPOKEN_LINES and
+   store BoardActions on the VideoJob.
+2. Migrate Pages/Videos/Watch.cshtml to render BoardActions via
+   board-renderer.js when present (fall back to legacy path otherwise).
+3. Stroke-by-stroke draw-on animation using ElevenLabs word timings
+   (VideoNarrationService already derives word-level timestamps).
+4. More primitives as golden lessons demand them (KaTeX math blocks, tables,
+   number lines, curved chem arrows).
+5. Fine-tuning / Azure Foundry deferred until prompting demonstrably
+   plateaus - decision log in the conversation: build board first, golden
+   lessons second, prompting third, fine-tuning fourth.
 
 This file is a handoff for Claude or any other model working in this repo. It summarizes the project, the architecture, the important code paths, and the decisions made in the recent conversation. It is intentionally opinionated and operational, not marketing copy.
 
