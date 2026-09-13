@@ -66,6 +66,7 @@ builder.Services.AddSingleton<IAiSpeechClient>(sp =>
         : sp.GetRequiredService<StubAiSpeechClient>();
 });
 
+builder.Services.AddSingleton<ILessonDirector, LessonDirector>();
 builder.Services.AddSingleton<IAiTeacherService, AiTeacherService>();
 builder.Services.AddSingleton<IVideoNarrationService, VideoNarrationService>();
 builder.Services.AddSingleton<RealtimeWhiteboardCoordinator>();

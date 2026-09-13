@@ -13,11 +13,13 @@ public sealed class AiTeacherService : IAiTeacherService
     private static readonly Regex NarrationWordRegex = new(@"[A-Za-z0-9]+(?:['’][A-Za-z0-9]+)?", RegexOptions.Compiled);
 
     private readonly IAiChatClient _ai;
+    private readonly ILessonDirector _director;
     private readonly AiOptions _options;
 
-    public AiTeacherService(IAiChatClient ai, IOptions<AiOptions> options)
+    public AiTeacherService(IAiChatClient ai, ILessonDirector director, IOptions<AiOptions> options)
     {
         _ai = ai;
+        _director = director;
         _options = options.Value;
     }
 
@@ -306,6 +308,9 @@ public sealed class AiTeacherService : IAiTeacherService
                 length));
         }
 
+        // Director stage: plan the lesson structure before writing it. Null plan = generate as before.
+        var plan = await _director.PlanLessonAsync(topic, length, ct);
+
         const string systemPrompt =
             "You are an expert SAT tutor who teaches like a real classroom teacher. " +
             "Write in a friendly spoken voice and include what to write on a whiteboard. " +
@@ -331,12 +336,14 @@ public sealed class AiTeacherService : IAiTeacherService
         var suggestedMathVisuals = BuildRequiredMathVisualLines(topic, allowGenericFallback: true);
         var hasSpecificMathVisualPlan = suggestedMathVisuals.Count > 0;
         var needsNonRightTriangleCounterexample = NeedsNonRightTriangleCounterexample(normalizedTopic);
-        var isVerbalTopic =
+        var keywordVerbalTopic =
             ContainsAny(normalizedTopic,
                 "transition", "grammar", "punctuation", "vocab", "vocabulary",
                 "reading", "writing", "rhetoric", "evidence", "inference",
-                "tone", "sentence", "paragraph", "clause", "pronoun", "verb", "conjunction")
-            && !requiresMathDiagram;
+                "tone", "sentence", "paragraph", "clause", "pronoun", "verb", "conjunction");
+        // The director's AI classification beats keyword matching when a plan exists;
+        // keyword-detected math diagrams still veto the verbal treatment either way.
+        var isVerbalTopic = (plan?.IsVerbalTopic ?? keywordVerbalTopic) && !requiresMathDiagram;
 
         var diagramRequirement =
             needsCalculus
@@ -387,6 +394,15 @@ public sealed class AiTeacherService : IAiTeacherService
                                 ? "- Diagram requirement: if you include a visual, it must directly match the concept you are explaining. Do NOT swap in a generic graph or unrelated shape.\n" +
                                   string.Concat(suggestedMathVisuals.Take(4).Select(line => $"  - {line}\n"))
                             : "";
+
+        // When keyword heuristics found no matching visual but the director planned one,
+        // let the plan drive the diagram requirement (covers custom topics the keywords miss).
+        if (plan is not null && plan.WantsVisual && diagramRequirement.Length == 0 && !isVerbalTopic)
+        {
+            diagramRequirement =
+                $"- Diagram requirement (from the lesson plan): include a {plan.DescribeVisual()} visual that directly matches the concept being taught, " +
+                "and add at least one \"DRAW: focus ...\" moment while explaining it.\n";
+        }
 
         var drawPolicy =
             hasSpecificMathVisualPlan
@@ -447,6 +463,7 @@ public sealed class AiTeacherService : IAiTeacherService
 
         var userPrompt =
             $"Create a {lessonDurationLabel} SAT lesson script on this topic:\n\n{topic}\n\n" +
+            BuildLessonPlanPromptBlock(plan) +
             "Output format EXACTLY:\n" +
             "NARRATION:\n" +
             "(spoken lesson script)\n\n" +
@@ -955,6 +972,32 @@ public sealed class AiTeacherService : IAiTeacherService
 
     private bool IsOpenAiEnabled() =>
         _options.UseOpenAi();
+
+    private static string BuildLessonPlanPromptBlock(LessonPlan? plan)
+    {
+        if (plan is null || plan.Beats.Count == 0)
+            return "";
+
+        var sb = new StringBuilder();
+        sb.Append("Lesson plan (designed by the lesson director — follow it):\n");
+        for (var i = 0; i < plan.Beats.Count; i++)
+        {
+            var beat = plan.Beats[i];
+            sb.Append($"{i + 1}. {beat.Title}");
+            if (!string.IsNullOrWhiteSpace(beat.Goal))
+                sb.Append($" — goal: {beat.Goal}");
+            if (!string.IsNullOrWhiteSpace(beat.BoardHint))
+                sb.Append($"; board: {beat.BoardHint}");
+            if (!string.IsNullOrWhiteSpace(beat.DrawHint))
+                sb.Append($"; visual: {beat.DrawHint}");
+            sb.Append('\n');
+        }
+        if (!string.IsNullOrWhiteSpace(plan.StyleNotes))
+            sb.Append($"Director style notes: {plan.StyleNotes}\n");
+        sb.Append("- Teach the beats in this exact order, expanding each beat into its own narration passage and its own aligned board lines.\n");
+        sb.Append("- Do not add or remove major sections relative to this plan.\n\n");
+        return sb.ToString();
+    }
 
     private static string FormatChoices(IReadOnlyList<string> choices)
     {

@@ -7,6 +7,29 @@ Commit: `7068423` (`Add ElevenLabs narration and improve board planning`)
 
 This file is a handoff for Claude or any other model working in this repo. It summarizes the project, the architecture, the important code paths, and the decisions made in the recent conversation. It is intentionally opinionated and operational, not marketing copy.
 
+## 0. Roadmap: The Lesson Director
+
+The lesson pipeline is moving from "one giant single-shot prompt shaped by keyword heuristics" to "plan first, write against the plan". The planning stage is called the **Director**.
+
+Status:
+
+1. **Wire the Director into the lesson pipeline — DONE (2026-09-13).**
+2. Feed the Director's plan into the beat-sync repair passes so repairs validate against the plan, not just heuristics.
+3. Use the plan in `ExplainQuestionVideoAsync` / `AnswerVideoQuestionAsync` (question-explanation surfaces).
+4. Expose the plan in a debug view alongside `WHITEBOARD` / `SPOKEN_LINES` / timings.
+
+How step 1 works today:
+
+- `Services/Ai/ILessonDirector.cs` + `Services/Ai/LessonDirector.cs`: one small chat call that returns strict JSON — `topicKind` (math/verbal/general), `visualKind` (none/coordinate-graph/triangle/trig-triangle/circle/bar-chart/other), `styleNotes`, and 6–16 ordered `beats` (`title`, `goal`, `board` hint, optional `draw` hint). One retry on bad JSON; validated and clipped; returns `null` on any failure.
+- `Services/Ai/LessonPlan.cs`: the `LessonPlan` / `LessonBeat` records.
+- `AiTeacherService.GenerateLessonVideoAsync` calls `PlanLessonAsync` first (OpenAI path only), then:
+  - renders the plan as a locked "Lesson plan (designed by the lesson director)" outline block inside the writer prompt (so retries inherit it);
+  - uses `plan.IsVerbalTopic` instead of keyword matching to classify verbal topics (keyword-detected math diagrams still veto);
+  - when keyword heuristics produce no diagram requirement but the plan wants a visual, the plan's `visualKind` drives the diagram requirement (covers custom topics the keywords miss).
+- Fail-open: a `null` plan means the pipeline behaves exactly as before the Director existed.
+- Config: `Ai.Director.Enabled` (default `true`) in `AiOptions` / `appsettings.json`. The Director never runs in Stub mode.
+- DI: `ILessonDirector` is registered as a singleton in `Program.cs` and injected into `AiTeacherService`.
+
 ## 1. Project Summary
 
 `ai-teacher` is an ASP.NET Core Razor Pages app for SAT tutoring. It has four main product surfaces:

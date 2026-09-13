@@ -6,6 +6,7 @@ public sealed class AiOptions
     public string? TtsProvider { get; set; }
     public OpenAiOptions OpenAi { get; set; } = new();
     public ElevenLabsOptions ElevenLabs { get; set; } = new();
+    public LessonDirectorOptions Director { get; set; } = new();
 
     public bool UseOpenAi()
     {
@@ -49,6 +50,11 @@ public sealed class AiOptions
 
         return UseOpenAi() ? "OpenAI" : "Stub";
     }
+}
+
+public sealed class LessonDirectorOptions
+{
+    public bool Enabled { get; set; } = true;
 }
 
 public sealed class OpenAiOptions
