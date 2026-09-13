@@ -558,6 +558,27 @@ public sealed class AiTeacherService : IAiTeacherService
 
         }
 
+        // Plan-coverage validation: when the draft skipped planned beats, retry with the misses called out.
+        if (plan is not null)
+        {
+            for (var attempt = 0; attempt < 2; attempt++)
+            {
+                var missingBeats = FindPlanBeatsMissingFromLesson(plan, pack);
+                if (!HasWeakPlanCoverage(plan, missingBeats))
+                    break;
+
+                var planRetryPrompt = userPrompt +
+                    "\nCRITICAL PLAN ENFORCEMENT:\n" +
+                    "- The prior draft skipped or barely touched these planned lesson beats:\n" +
+                    string.Concat(missingBeats.Select(beat => $"  - {beat.Title}: {beat.Goal}\n")) +
+                    "- Regenerate the full lesson so EVERY beat of the lesson plan is taught, in the planned order.\n" +
+                    "- Keep the same output format (NARRATION/SPOKEN_LINES/WHITEBOARD/TIMINGS) and keep all earlier requirements, including narration length.\n";
+
+                text = await _ai.CompleteAsync(systemPrompt, planRetryPrompt, ct);
+                pack = ParseVideoPack(text, fallbackBoardHeader: $"TOPIC: {topic}");
+            }
+        }
+
         if (hasSpecificMathVisualPlan)
         {
             for (var attempt = 0; attempt < 2 && NeedsMathVisualRewrite(pack, length); attempt++)
@@ -604,8 +625,8 @@ public sealed class AiTeacherService : IAiTeacherService
             pack = EnsureMathLessonHasVisuals(pack, topic, length);
         }
 
-        pack = await RepairGeneratedBoardAlignmentAsync(pack, ct);
-        pack = await EnsureLessonBeatSyncAsync(topic, length, pack, ct);
+        pack = await RepairGeneratedBoardAlignmentAsync(pack, plan, ct);
+        pack = await EnsureLessonBeatSyncAsync(topic, length, pack, plan, ct);
         pack = RepairLessonSyncFallback(pack);
         return pack with { Narration = HumanizeNarration(pack.Narration) };
     }
@@ -849,7 +870,7 @@ public sealed class AiTeacherService : IAiTeacherService
             pack = EnsureStudentQuestionHasVisuals(pack, studentDrawCommands, headerLine);
         else if (shouldForceVisuals)
             pack = EnsureMathLessonHasVisuals(pack, visualTopic, LessonLength.Short, allowGenericFallback: false);
-        pack = await RepairGeneratedBoardAlignmentAsync(pack, ct);
+        pack = await RepairGeneratedBoardAlignmentAsync(pack, plan: null, ct);
 
         var narration = HumanizeNarration(pack.Narration);
         if (string.IsNullOrWhiteSpace(narration))
@@ -2634,7 +2655,7 @@ public sealed class AiTeacherService : IAiTeacherService
         return builder.ToString();
     }
 
-    private async Task<AiVideoPack> RepairGeneratedBoardAlignmentAsync(AiVideoPack pack, CancellationToken ct)
+    private async Task<AiVideoPack> RepairGeneratedBoardAlignmentAsync(AiVideoPack pack, LessonPlan? plan, CancellationToken ct)
     {
         var boardLines = CleanBoardLines(pack.BoardLines ?? new List<string>());
         var narrationSegments = CleanNarrationSegments(pack.NarrationSegments ?? new List<string>());
@@ -2670,6 +2691,7 @@ public sealed class AiTeacherService : IAiTeacherService
             "- If a spoken line is a hook, vocabulary setup, warning, or transition, give it a matching short board line.\n" +
             "- Keep DRAW lines only when the spoken line is clearly about the diagram or focus point.\n" +
             "- Output only the repaired whiteboard lines, one per line, prefixed with '- '.\n\n" +
+            BuildPlanRepairContextBlock(plan, includeGoals: false) +
             "Current WHITEBOARD:\n" +
             string.Join('\n', currentBoard) +
             "\n\nSPOKEN_LINES:\n" +
@@ -2687,6 +2709,7 @@ public sealed class AiTeacherService : IAiTeacherService
         string topic,
         LessonLength length,
         AiVideoPack pack,
+        LessonPlan? plan,
         CancellationToken ct)
     {
         var boardLines = CleanBoardLines(pack.BoardLines ?? new List<string>());
@@ -2753,8 +2776,11 @@ public sealed class AiTeacherService : IAiTeacherService
                 drawRequirement +
                 "- Timings: one strictly increasing timestamp per whiteboard line, format MM:SS or HH:MM:SS.\n" +
                 "- Each timestamp is when that board line should START from narration start.\n" +
+                (plan is null ? "" : "- Keep the narration true to the planned beats and their goals, in the planned order.\n") +
                 retryRequirement +
-                "\nFixed WHITEBOARD:\n" +
+                "\n" +
+                BuildPlanRepairContextBlock(plan, includeGoals: true) +
+                "Fixed WHITEBOARD:\n" +
                 boardText +
                 "\n\nCurrent narration draft:\n" +
                 narration;
@@ -2879,6 +2905,63 @@ public sealed class AiTeacherService : IAiTeacherService
         }
 
         return keywords;
+    }
+
+    private static string BuildPlanRepairContextBlock(LessonPlan? plan, bool includeGoals)
+    {
+        if (plan is null || plan.Beats.Count == 0)
+            return "";
+
+        var sb = new StringBuilder();
+        sb.Append("Planned lesson structure (stay consistent with these beats and their order):\n");
+        for (var i = 0; i < plan.Beats.Count; i++)
+        {
+            var beat = plan.Beats[i];
+            sb.Append($"{i + 1}. {beat.Title}");
+            if (includeGoals && !string.IsNullOrWhiteSpace(beat.Goal))
+                sb.Append($" — {beat.Goal}");
+            if (!includeGoals && !string.IsNullOrWhiteSpace(beat.BoardHint))
+                sb.Append($" — board: {beat.BoardHint}");
+            sb.Append('\n');
+        }
+        sb.Append('\n');
+        return sb.ToString();
+    }
+
+    private static List<LessonBeat> FindPlanBeatsMissingFromLesson(LessonPlan plan, AiVideoPack pack)
+    {
+        var lessonTokens = TokenizeLessonText(pack);
+        var missing = new List<LessonBeat>();
+        foreach (var beat in plan.Beats)
+        {
+            var keywords = ExtractAlignmentKeywords($"{beat.Title}. {beat.Goal}. {beat.BoardHint}");
+            if (keywords.Count == 0)
+                continue;
+
+            var overlapCount = keywords.Count(lessonTokens.Contains);
+            var requiredOverlap = keywords.Count >= 4 ? 2 : 1;
+            if (overlapCount < requiredOverlap)
+                missing.Add(beat);
+        }
+
+        return missing;
+    }
+
+    private static bool HasWeakPlanCoverage(LessonPlan plan, IReadOnlyList<LessonBeat> missingBeats) =>
+        missingBeats.Count >= 2 && missingBeats.Count * 4 >= plan.Beats.Count;
+
+    private static HashSet<string> TokenizeLessonText(AiVideoPack pack)
+    {
+        var sb = new StringBuilder(pack.Narration ?? "");
+        foreach (var line in pack.BoardLines ?? new List<string>())
+            sb.Append('\n').Append(line);
+        foreach (var segment in pack.NarrationSegments ?? new List<string>())
+            sb.Append('\n').Append(segment);
+
+        var tokens = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (Match match in Regex.Matches(sb.ToString().ToLowerInvariant(), @"[a-z0-9]+"))
+            tokens.Add(match.Value);
+        return tokens;
     }
 
     private static List<string> BuildRequiredMathVisualLines(string topic, bool allowGenericFallback = false)
