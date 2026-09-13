@@ -652,6 +652,9 @@ public sealed class AiTeacherService : IAiTeacherService
             return new AiVideoPack(HumanizeNarration(fallbackNarration), fallbackBoard, EvenTimings(fallbackBoard.Count));
         }
 
+        // Director stage: plan the walkthrough structure before writing it. Null plan = generate as before.
+        var plan = await _director.PlanQuestionExplanationAsync(exam, question, studentChoiceIndex, ct);
+
         const string systemPrompt =
             "You are an expert SAT tutor. Explain solutions step-by-step with clear reasoning. " +
             "Teach like a real teacher: say what you'd write on the board. " +
@@ -669,6 +672,7 @@ public sealed class AiTeacherService : IAiTeacherService
             $"Choices:\n{FormatChoices(question.Choices)}\n\n" +
             $"Correct choice index: {question.CorrectChoiceIndex}\n" +
             $"{studentChoiceText}\n\n" +
+            BuildLessonPlanPromptBlock(plan) +
             "Output format EXACTLY:\n" +
             "NARRATION:\n" +
             "(spoken explanation)\n\n" +
@@ -713,6 +717,9 @@ public sealed class AiTeacherService : IAiTeacherService
             "  - DRAW: square id=s1 center=(2,2) size=2 angle=20\n" +
             "  - DRAW: move id=s1 x=1 y=2\n" +
             "- If you update/reuse a shape, include a stable id= in those DRAW lines.\n" +
+            (plan is not null && plan.WantsVisual
+                ? $"- The lesson director recommends a {plan.DescribeVisual()} visual for this solution; include it with at least one \"DRAW: focus ...\" line if it matches the explanation.\n"
+                : "") +
             "- For DRAW lines, keep the command syntax plain text (use '-' not '−') and keep commands short. Standard symbols like θ are allowed in labels.\n" +
             "- Use ASCII-friendly math for equations (no LaTeX). Standard symbols like θ are allowed in diagram labels.\n" +
             "- Timings: one timestamp per whiteboard line (same count), strictly increasing, format MM:SS (or HH:MM:SS).\n" +
@@ -720,7 +727,27 @@ public sealed class AiTeacherService : IAiTeacherService
             "- Narration length: roughly 450-700 words so the full reasoning is explained clearly.\n";
 
         var text = await _ai.CompleteAsync(systemPrompt, userPrompt, ct);
-        return ParseVideoPack(text, fallbackBoardHeader: "Solution steps:");
+        var pack = ParseVideoPack(text, fallbackBoardHeader: "Solution steps:");
+
+        // Plan-coverage validation: one retry when the draft skipped planned beats.
+        if (plan is not null)
+        {
+            var missingBeats = FindPlanBeatsMissingFromLesson(plan, pack);
+            if (HasWeakPlanCoverage(plan, missingBeats))
+            {
+                var planRetryPrompt = userPrompt +
+                    "\nCRITICAL PLAN ENFORCEMENT:\n" +
+                    "- The prior draft skipped or barely touched these planned explanation beats:\n" +
+                    string.Concat(missingBeats.Select(beat => $"  - {beat.Title}: {beat.Goal}\n")) +
+                    "- Regenerate the full explanation so EVERY planned beat is covered, in the planned order.\n" +
+                    "- Keep the same output format (NARRATION/SPOKEN_LINES/WHITEBOARD/TIMINGS) and keep all earlier requirements.\n";
+
+                text = await _ai.CompleteAsync(systemPrompt, planRetryPrompt, ct);
+                pack = ParseVideoPack(text, fallbackBoardHeader: "Solution steps:");
+            }
+        }
+
+        return pack;
     }
 
     public async Task<AiVideoPack> AnswerVideoQuestionAsync(VideoJob video, string question, double? progress, VideoQuestionBoardRequest? board, CancellationToken ct)
