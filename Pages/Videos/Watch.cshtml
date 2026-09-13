@@ -77,6 +77,89 @@
 
 <pre id="lesson-script" class="card script">@Model.Video.Script</pre>
 
+@{
+    var debugBoardLines = Model.Video.BoardLines ?? new List<string>();
+    var debugSegments = Model.Video.NarrationSegments ?? new List<string>();
+    var debugTimings = Model.Video.BoardTimings ?? new List<double>();
+    var debugSeconds = Model.Video.BoardTimestampSeconds ?? new List<double>();
+    var inv = System.Globalization.CultureInfo.InvariantCulture;
+}
+
+<details class="card debug-panel">
+    <summary>Debug: lesson plan &amp; board sync</summary>
+
+    <div class="debug-section">
+        <div class="h3">Director plan</div>
+        @if (Model.Video.Plan is { } plan)
+        {
+            <p class="muted small">
+                Topic kind: <strong>@plan.TopicKind</strong> · Visual kind: <strong>@plan.VisualKind</strong>
+                @if (!string.IsNullOrWhiteSpace(plan.StyleNotes))
+                {
+                    <text> · Style notes: @plan.StyleNotes</text>
+                }
+            </p>
+            <ol class="debug-beats">
+                @foreach (var beat in plan.Beats)
+                {
+                    <li>
+                        <strong>@beat.Title</strong>
+                        @if (!string.IsNullOrWhiteSpace(beat.Goal))
+                        {
+                            <text> — @beat.Goal</text>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(beat.BoardHint))
+                        {
+                            <div class="muted small">board: @beat.BoardHint</div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(beat.DrawHint))
+                        {
+                            <div class="muted small">visual: @beat.DrawHint</div>
+                        }
+                    </li>
+                }
+            </ol>
+        }
+        else
+        {
+            <p class="muted small">No director plan stored for this video (generated before the Director existed, in Stub mode, or planning failed).</p>
+        }
+    </div>
+
+    <div class="debug-section">
+        <div class="h3">Board sync</div>
+        <p class="muted small">
+            @debugBoardLines.Count board lines · @debugSegments.Count spoken lines ·
+            @debugTimings.Count planned timings · @debugSeconds.Count resolved timestamps
+        </p>
+        <div class="debug-table-wrap">
+            <table class="debug-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Whiteboard</th>
+                        <th>Spoken line</th>
+                        <th>Planned</th>
+                        <th>Resolved (s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < debugBoardLines.Count; i++)
+                    {
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>@debugBoardLines[i]</td>
+                            <td>@(i < debugSegments.Count ? debugSegments[i] : "—")</td>
+                            <td>@(i < debugTimings.Count ? debugTimings[i].ToString("0.###", inv) : "—")</td>
+                            <td>@(i < debugSeconds.Count ? debugSeconds[i].ToString("0.00", inv) : "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</details>
+
 <div class="loading-overlay" id="qa-overlay" hidden>
     <div class="card qa-modal form" role="dialog" aria-modal="true" aria-labelledby="qa-title">
         <div class="qa-head">

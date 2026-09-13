@@ -148,6 +148,7 @@ app.MapPost("/api/attempts/{attemptId:guid}/questions/{questionId:guid}/video",
         string[] boardLines;
         double[] boardTimings;
         double[] boardTimestampSeconds;
+        LessonPlan? plan = null;
 
         if (attempts.TryGetExplanation(attemptId, questionId, out var cachedExplanation)
             && attempts.TryGetBoardLines(attemptId, questionId, out var cachedBoardLines)
@@ -175,6 +176,7 @@ app.MapPost("/api/attempts/{attemptId:guid}/questions/{questionId:guid}/video",
             boardLines = pack.BoardLines.ToArray();
             boardTimings = pack.BoardTimings.ToArray();
             boardTimestampSeconds = pack.BoardTimestampSeconds?.ToArray() ?? Array.Empty<double>();
+            plan = pack.Plan;
 
             attempts.SetExplanation(attemptId, questionId, script);
             attempts.SetBoardLines(attemptId, questionId, boardLines);
@@ -192,6 +194,7 @@ app.MapPost("/api/attempts/{attemptId:guid}/questions/{questionId:guid}/video",
             BoardLines = boardLines.ToList(),
             BoardTimings = boardTimings.ToList(),
             BoardTimestampSeconds = boardTimestampSeconds.ToList(),
+            Plan = plan,
             CreatedAtUtc = DateTimeOffset.UtcNow,
         };
 

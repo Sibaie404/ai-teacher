@@ -73,6 +73,7 @@ public class IndexModel : PageModel
                 BoardLines = pack.BoardLines,
                 BoardTimings = pack.BoardTimings,
                 BoardTimestampSeconds = pack.BoardTimestampSeconds ?? new List<double>(),
+                Plan = pack.Plan,
                 CreatedAtUtc = DateTimeOffset.UtcNow
             };
 

@@ -628,7 +628,7 @@ public sealed class AiTeacherService : IAiTeacherService
         pack = await RepairGeneratedBoardAlignmentAsync(pack, plan, ct);
         pack = await EnsureLessonBeatSyncAsync(topic, length, pack, plan, ct);
         pack = RepairLessonSyncFallback(pack);
-        return pack with { Narration = HumanizeNarration(pack.Narration) };
+        return pack with { Narration = HumanizeNarration(pack.Narration), Plan = plan };
     }
 
     public async Task<string> ExplainQuestionAsync(Exam exam, Question question, int? studentChoiceIndex, CancellationToken ct)
@@ -747,7 +747,7 @@ public sealed class AiTeacherService : IAiTeacherService
             }
         }
 
-        return pack;
+        return pack with { Plan = plan };
     }
 
     public async Task<AiVideoPack> AnswerVideoQuestionAsync(VideoJob video, string question, double? progress, VideoQuestionBoardRequest? board, CancellationToken ct)

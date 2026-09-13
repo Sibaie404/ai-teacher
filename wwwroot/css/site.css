@@ -892,3 +892,30 @@ textarea.input {
   background: rgba(127, 29, 29, 0.22);
   color: rgba(254, 226, 226, 0.98);
 }
+
+.debug-panel { margin-top: 14px; }
+.debug-panel > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted);
+}
+.debug-panel > summary:hover { color: var(--text); }
+.debug-panel[open] > summary { margin-bottom: 6px; color: var(--text); }
+.debug-section { margin-top: 12px; }
+.debug-beats { margin: 8px 0 0; padding-left: 20px; }
+.debug-beats li { margin-bottom: 8px; }
+.debug-table-wrap { overflow-x: auto; }
+.debug-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.debug-table th,
+.debug-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.debug-table th { color: var(--muted); font-weight: 600; }
+.debug-table td:first-child { color: var(--muted); white-space: nowrap; }

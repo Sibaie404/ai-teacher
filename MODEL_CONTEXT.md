@@ -16,7 +16,9 @@ Status:
 1. **Wire the Director into the lesson pipeline — DONE (2026-09-13).**
 2. **Feed the Director's plan into validation and the beat-sync repair passes — DONE (2026-09-13).**
 3. **Use the plan in the question-explanation surfaces — DONE (2026-09-13)** for `ExplainQuestionVideoAsync`; `AnswerVideoQuestionAsync` deliberately skips planning (see below).
-4. Expose the plan in a debug view alongside `WHITEBOARD` / `SPOKEN_LINES` / timings.
+4. **Expose the plan in a debug view — DONE (2026-09-13).**
+
+All four roadmap steps are complete. Future Director work is open-ended (e.g. plan-aware narration audio pacing, plan caching, surfacing plans in the realtime tutor).
 
 How step 1 works today:
 
@@ -36,6 +38,12 @@ How step 3 works today:
 - `ILessonDirector.PlanQuestionExplanationAsync(exam, question, studentChoiceIndex, ct)` plans a 5–9 beat solution walkthrough (restate → concept → setup → solution steps → wrong-choice analysis → verify → takeaway); when the student picked a wrong choice, the planner is told to include a beat on why it is tempting but wrong. Same JSON contract, parser, and fail-open behavior as lesson planning (shared `RequestPlanAsync` core).
 - `ExplainQuestionVideoAsync` renders the plan into the writer prompt, adds a plan-recommended visual line when `visualKind` is set, and runs one plan-coverage retry (same `FindPlanBeatsMissingFromLesson` / `HasWeakPlanCoverage` machinery).
 - `AnswerVideoQuestionAsync` intentionally has NO planning stage: it is an interactive mid-video surface (student waits on the response), the answer is ~20–60 seconds with a fixed mandated shape (acknowledge → answer → return to lesson), so a serial planning round-trip would add latency for negligible structural gain. Revisit only if answer quality shows structural problems.
+
+How step 4 works today:
+
+- `AiVideoPack` carries an optional `Plan`; `GenerateLessonVideoAsync` and `ExplainQuestionVideoAsync` attach the Director's plan to their final pack.
+- `VideoJob.Plan` (nullable `LessonPlan`) persists it in `App_Data/videos.json`; old entries without the field deserialize to null.
+- The Watch page (`Pages/Videos/Watch.cshtml`) has a collapsed "Debug: lesson plan & board sync" `<details>` panel showing the Director plan (classification, style notes, beats with board/visual hints) and a per-line sync table: `WHITEBOARD` | `SPOKEN_LINES` | planned `BoardTimings` | resolved `BoardTimestampSeconds`.
 
 - Fail-open: a `null` plan means the pipeline behaves exactly as before the Director existed.
 - Config: `Ai.Director.Enabled` (default `true`) in `AiOptions` / `appsettings.json`. The Director never runs in Stub mode.

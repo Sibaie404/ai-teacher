@@ -1,3 +1,5 @@
+using AiTeacher.Services.Ai;
+
 namespace AiTeacher.Models;
 
 public sealed class VideoJob
@@ -12,5 +14,6 @@ public sealed class VideoJob
     public List<double> BoardTimestampSeconds { get; set; } = new();
     public string? AudioUrl { get; set; }
     public string? VideoUrl { get; set; }
+    public LessonPlan? Plan { get; set; }
     public DateTimeOffset CreatedAtUtc { get; set; }
 }
